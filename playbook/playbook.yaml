@@ -1,0 +1,32 @@
+---
+  - name: SSH configuration
+    hosts: all
+    become: yes
+    vars:
+        ssh_key: "{{ lookup('file', './cloud.pub') }}"
+
+    tasks:
+        - name: Create cloudru user
+          ansible.builtin.user:
+              name: cloudru
+              password: "{{ 'cloudpass' | password_hash('sha512', 'salt') }}"
+              state: present
+
+        - name: Allow SSH login via ssh-key
+          ansible.builtin.lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: '^#?PubkeyAuthentication\s+'
+            line: 'PubkeyAuthentication yes'
+            state: present
+
+        - name: Disallow root SSH login
+          ansible.builtin.lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: '^#?PermitRootLogin\s+'
+            line: 'PermitRootLogin no'
+            state: present
+
+        - name: Copy public key for cloudru user
+          ansible.posix.authorized_key:
+            user: cloudru
+            key: '{{ ssh_key }}'
