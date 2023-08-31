@@ -25,10 +25,21 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCfrfE0OluoNHb5dOpV4RpWmVXvMBWc17kaM7DDjCm7
 - GET /author - возвращает значение переменной окружения $AUTHOR, в которой задано имя или никнейм человека, выполняющего это задание
 - GET /id - возвращает значение переменной окружения $UUID, содержащее любую произвольную строку-идентификатор в формате uuid
 
+```
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+curl http://localhost:8000/hostname
+```
+
 ### Dockerfile
 Необходимо написать Dockerfile для полученного приложения в соответствии с принятыми в сообществе best-practice.
 
 Полученный скрипт и Dockerfile к нему положить в папку /app
+
+```
+$ cd app
+$ docker build -t devopscloudcamp-tasks .
+$ docker run -d -p 8000:8000 devopscloudcamp-tasks
+```
 
 ### Kubernetes manifest
 Далее необходимо написать манифест для запуска приложения в Kubernetes в отдельном неймспейсе в виде Deployment с 3 репликами и сервиса с типом ClusterIP. Реализовать readiness- и liveness- пробы. В переменную UUID должен подставляться уникальный идентификатор пода в кластере, в котором запущено приложение.
