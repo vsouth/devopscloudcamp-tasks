@@ -37,8 +37,9 @@ curl http://localhost:8000/hostname
 
 ```
 $ cd app
-$ docker build -t devopscloudcamp-tasks .
-$ docker run -d -p 8000:8000 devopscloudcamp-tasks
+$ docker build -t devopscloudcamptasks .
+$ docker run -d -p 8000:8000 devopscloudcamptasks
+docker tag devopscloudcamptasks:latest devopscloudcamptasks:v1
 ```
 
 ### Kubernetes manifest
@@ -48,6 +49,12 @@ $ docker run -d -p 8000:8000 devopscloudcamp-tasks
 
 Для локального запуска кластера можно использовать инструменты Docker Desktop, kind, minikube и другие 
 
+```
+kubectl apply -f manifest/deployment.yaml
+kubectl apply -f manifest/service.yaml
+kubectl port-forward svc/devopscloudcamp  8000:8000 -n cloudru
+```
+
 ### Helm chart
 Написать Helm чарт, в котором через переменные в файле values.yaml можно задать:
 - имя образа, запускаемого в поде 
@@ -55,3 +62,5 @@ $ docker run -d -p 8000:8000 devopscloudcamp-tasks
 - значение, подставляемое в переменную AUTHOR
 
 Полученный чарт положить в папку /helm
+
+
