@@ -18,6 +18,15 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCfrfE0OluoNHb5dOpV4RpWmVXvMBWc17kaM7DDjCm7
 ```
 Полученный плейбук и команду для его запуска положить в папку /playbook
 
+#### Как протестировать:
+```
+ansible-playbook playbook.yaml -i hosts.ini -K
+```
+или
+```
+ansible-playbook playbook.yaml
+```
+
 ## 2. Web приложение на Python
 ### Приложение
 Требуется написать простое веб-приложение на Python, которое слушает входящие соединения на порту 8000 и предоставляет HTTP API, в котором реализовано 3 метода:
@@ -25,6 +34,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCfrfE0OluoNHb5dOpV4RpWmVXvMBWc17kaM7DDjCm7
 - GET /author - возвращает значение переменной окружения $AUTHOR, в которой задано имя или никнейм человека, выполняющего это задание
 - GET /id - возвращает значение переменной окружения $UUID, содержащее любую произвольную строку-идентификатор в формате uuid
 
+#### Как протестировать:
 ```
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 curl http://localhost:8000/hostname
@@ -35,11 +45,12 @@ curl http://localhost:8000/hostname
 
 Полученный скрипт и Dockerfile к нему положить в папку /app
 
+#### Как протестировать:
 ```
 $ cd app
 $ docker build -t devopscloudcamptasks .
 $ docker run -d -p 8000:8000 devopscloudcamptasks
-docker tag devopscloudcamptasks:latest devopscloudcamptasks:v1
+$ docker tag devopscloudcamptasks:latest devopscloudcamptasks:v1
 ```
 
 ### Kubernetes manifest
@@ -49,11 +60,17 @@ docker tag devopscloudcamptasks:latest devopscloudcamptasks:v1
 
 Для локального запуска кластера можно использовать инструменты Docker Desktop, kind, minikube и другие 
 
+#### Как протестировать:
 ```
-kubectl apply -f manifest/deployment.yaml
-kubectl apply -f manifest/service.yaml
-kubectl port-forward svc/devopscloudcamp  8000:8000 -n cloudru
+$ kubectl apply -f manifest/deployment.yaml
+$ kubectl apply -f manifest/service.yaml
+$ kubectl port-forward svc/devopscloudcamp  8000:8000 -n cloudru
 ```
+В дополнительно открытом терминале:
+```
+curl http://localhost:8000/hostname
+```
+
 
 ### Helm chart
 Написать Helm чарт, в котором через переменные в файле values.yaml можно задать:
@@ -63,4 +80,14 @@ kubectl port-forward svc/devopscloudcamp  8000:8000 -n cloudru
 
 Полученный чарт положить в папку /helm
 
-
+#### Как протестировать:
+```
+kubectl delete all --all -n cloudru
+kubectl delete ns cloudru
+helm upgrade --install devopscloudcamp . --namespace cloudru --create-namespace
+kubectl port-forward svc/devopscloudcamp  8000:8000 -n cloudru
+```
+В дополнительно открытом терминале:
+```
+curl http://localhost:8000/hostname
+```

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devopscloudcamp
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: devopscloudcamp
+  template:
+    metadata:
+      labels:
+        app: devopscloudcamp
+    spec:
+      containers:
+      - name: devopscloudcamp
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: UUID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.uid
+          - name: AUTHOR
+            value: {{ .Values.author }}
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+            httpGet:
+              path: /hostname
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /hostname
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10

@@ -1,0 +1,7 @@
+image:
+  repository: devopscloudcamptasks
+  tag: "v1"
+
+replicaCount: 3
+
+author: "Poshelyuzhnaya Vasilisa"
