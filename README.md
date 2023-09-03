@@ -18,13 +18,14 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCfrfE0OluoNHb5dOpV4RpWmVXvMBWc17kaM7DDjCm7
 ```
 Полученный плейбук и команду для его запуска положить в папку /playbook
 
-#### Как протестировать:
+#### Как запустить:
+Внести изменения на localhost:
 ```
-ansible-playbook playbook.yaml -i hosts.ini -K
+ansible-playbook playbook/playbook.yaml -i playbook/hosts.ini -K
 ```
-или
+Или, если есть свой список hosts:
 ```
-ansible-playbook playbook.yaml
+ansible-playbook playbook/playbook.yaml
 ```
 
 ## 2. Web приложение на Python
@@ -37,6 +38,9 @@ ansible-playbook playbook.yaml
 #### Как протестировать:
 ```
 uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+В дополнительно открытом терминале:
+```
 curl http://localhost:8000/hostname
 ```
 
@@ -47,10 +51,12 @@ curl http://localhost:8000/hostname
 
 #### Как протестировать:
 ```
-$ cd app
-$ docker build -t devopscloudcamptasks .
-$ docker run -d -p 8000:8000 devopscloudcamptasks
-$ docker tag devopscloudcamptasks:latest devopscloudcamptasks:v1
+cd app
+docker build -t devopscloudcamptasks .
+docker run -d -p 8000:8000 devopscloudcamptasks
+docker tag devopscloudcamptasks:latest devopscloudcamptasks:v1
+curl http://localhost:8000/hostname
+cd ..
 ```
 
 ### Kubernetes manifest
@@ -62,9 +68,11 @@ $ docker tag devopscloudcamptasks:latest devopscloudcamptasks:v1
 
 #### Как протестировать:
 ```
-$ kubectl apply -f manifest/deployment.yaml
-$ kubectl apply -f manifest/service.yaml
-$ kubectl port-forward svc/devopscloudcamp  8000:8000 -n cloudru
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+kubectl apply -f manifest/deployment.yaml
+kubectl apply -f manifest/service.yaml
+kubectl port-forward svc/devopscloudcamp  8000:8000 -n cloudru
 ```
 В дополнительно открытом терминале:
 ```
@@ -84,10 +92,22 @@ curl http://localhost:8000/hostname
 ```
 kubectl delete all --all -n cloudru
 kubectl delete ns cloudru
+cd helm/
 helm upgrade --install devopscloudcamp . --namespace cloudru --create-namespace
+cd ..
 kubectl port-forward svc/devopscloudcamp  8000:8000 -n cloudru
 ```
 В дополнительно открытом терминале:
 ```
 curl http://localhost:8000/hostname
+```
+### Закрыть:
+```
+helm uninstall devopscloudcamp -n cloudru
+kubectl delete -f manifest/service.yaml 
+kubectl delete -f manifest/deployment.yaml
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+docker rmi devopscloudcamptasks:latest
+docker rmi devopscloudcamptasks:v1
 ```
